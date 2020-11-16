@@ -8,6 +8,7 @@
 #include "config.h"
 #include <xc.h>
 #include <stdio.h>
+#include <string.h>
 #include "rs232.h"
 #include "adc.h"
 #define _XTAL_FREQ 8000000
@@ -24,8 +25,13 @@ void main(void) {
     float mean;   
     char str[20];                      //
     char strV[10];
+    char c = 'x';
+    
+    char init[]= "start";
+    send_string_rs232(init); // send
     
     while (1){
+        /*
         // data adq
         counter++;
         temps[counter % N_LCTRS] = adc_start();
@@ -41,14 +47,17 @@ void main(void) {
         
         // formating
         sprintf(str,"%d: ", counter); // counter to string
-        sprintf(strV,"%.2f\'C", mean );  // temp to formated string
+        sprintf(strV,"%.2f\'C" , mean );  // temp to formated string
         strcat(str,strV);       // str += strV
         
         // send
         send_string_rs232(str); // send
         
         // wait
-        __delay_ms(200);   
+        __delay_ms(500);
+        */
+        c= receive_rs232();
+        send_rs232(c);        
     } 
     return;
 }

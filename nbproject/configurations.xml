@@ -16,6 +16,8 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>newmain.c</itemPath>
+      <itemPath>adc.c</itemPath>
+      <itemPath>rs232.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
