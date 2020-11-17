@@ -13,6 +13,7 @@
 #include "adc.h"
 #define _XTAL_FREQ 8000000
 #define N_LCTRS 10
+#define MAX_AT_LENGTH 20
 
 void main(void) {
     ////////////////// configuracion del microcontrolador //////////////////////
@@ -20,12 +21,14 @@ void main(void) {
     setup_rs232();
     adc_configure();
     // vars
-    unsigned int counter = 0;           // counter
-    int temps[N_LCTRS]= {0};            // Ultimas temperaturas
-    float mean;   
-    char str[20];                      //
-    char strV[10];
-    char c = 'x';
+    //unsigned int counter = 0;           // counter
+    //int temps[N_LCTRS]= {0};            // Ultimas temperaturas
+    //float mean;   
+    char at_cmd[MAX_AT_LENGTH] = {0};              // received string
+    char sub_at_cmd[10] = {0};      // array for parsing
+    char sub_index = 0;
+    
+    // Begin series
     
     char init[]= "start";
     send_string_rs232(init); // send
@@ -48,7 +51,7 @@ void main(void) {
         // formating
         sprintf(str,"%d: ", counter); // counter to string
         sprintf(strV,"%.2f\'C" , mean );  // temp to formated string
-        strcat(str,strV);       // str += strV
+        find(str,strV);       // str += strV
         
         // send
         send_string_rs232(str); // send
@@ -56,8 +59,75 @@ void main(void) {
         // wait
         __delay_ms(500);
         */
-        c= receive_rs232();
-        send_rs232(c);        
+        
+        receive_AT_rs232(at_cmd);
+        strncpy(sub_at_cmd, at_cmd, 3);
+
+        if (strcmp("AT+", sub_at_cmd))
+            send_AT_rs232("ERROR");
+        else
+        {
+            for (sub_index = 3; sub_index < MAX_AT_LENGTH ; sub_index++)
+            {
+                if (at_cmd[sub_index] == '\0'){
+                    send_AT_rs232("END_ERROR");
+                    break;
+                }
+          
+                if (at_cmd[sub_index] == '?'){
+                    if (at_cmd[sub_index + 1] == '\x0d'){
+                        //send_AT_rs232(sub_at_cmd);
+                        send_AT_rs232("READ");
+                        break;
+                    }else{
+                        send_AT_rs232("READ_ERROR");
+                        break;
+                    }
+                }
+                if (at_cmd[sub_index] == '='){
+                    if (at_cmd[sub_index + 1] == '?'){
+                     //   send_AT_rs232(sub_at_cmd);
+                        send_AT_rs232("TEST");
+                           break;
+                    }
+                    else if ((at_cmd[sub_index + 1] != '\x0d') ||(at_cmd[sub_index + 1] != '\0')){
+                        send_AT_rs232("SET");
+                           break;
+                    }else{
+                        send_AT_rs232("EQUAL_ERROR");
+                    }                                   
+                }                               
+                if (at_cmd[sub_index] == '\x0d'){
+                    if (at_cmd[sub_index + 1] == '\x0a'){
+                        //send_AT_rs232(sub_at_cmd);
+                        send_AT_rs232("EXECUTE");
+                           break;                        
+                    }else{
+                        send_AT_rs232("EXE_ERROR");
+                           break;
+                    }
+                }                
+            }
+        }
+        
+        
+        
+        
+        
+        /*       
+        if (strcmp("AT\x0d\x0a", str))
+            send_AT_rs232("ERROR");
+        else
+            send_AT_rs232("OK");
+        
+        */
+        
+        /*
+        if (strcmp("AT", str))
+            send_string_rs232("ok");
+        else
+            send_string_rs232("error");
+        */ 
     } 
     return;
 }

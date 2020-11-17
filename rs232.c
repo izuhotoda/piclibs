@@ -57,7 +57,7 @@ void send_rs232(char car){
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-void send_string_rs232(char *cad){
+void send_string_rs232( char *cad){
     /* recibe un string de caracteres (debe terminar con '\0')
      * Los envia por TX dejando 1ms de espacio entre cada caracter
      * Talvez podria funcionar con menos 
@@ -81,6 +81,60 @@ void send_string_rs232(char *cad){
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+void send_raw_string_rs232(const char *cad){
+    /* recibe un string de caracteres (debe terminar con '\0')
+     * Los envia por TX dejando 1ms de espacio entre cada caracter
+     * Talvez podria funcionar con menos 
+     * Al final de la cadena envia un caracter de nueva linea 0x00 = '\n'
+     * eg.
+     * char s[]="shibanan";
+     * send_string_rs232(s);
+    */ 
+    /*===========================TO DO ===============================*/
+    //Verificar '\0' en cad
+    char hexchar[6]={0};
+    
+    for(int i = 0; i < strlen(cad); i++)
+    {
+            sprintf(hexchar, "0x%.2x ", cad[i]); // counter to string string 
+            send_string_rs232(hexchar);
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+
+void send_AT_rs232(char *cad){
+    /* recibe un string de caracteres (debe terminar con '\0')
+     * Los envia por TX dejando 1ms de espacio entre cada caracter
+     * Talvez podria funcionar con menos 
+     * Al final de la cadena envia un caracter de nueva linea 0x00 = '\n'
+     * eg.
+     * char s[]="shibanan";
+     * send_string_rs232(s);
+    */ 
+    /*===========================TO DO ===============================*/
+    //Verificar '\0' en cad
+    LATDbits.LATD0 = 1;
+    TXREG = 0x0d;
+    __delay_ms(1);
+    TXREG = 0x0a;
+    __delay_ms(1);
+    LATDbits.LATD0 = 0;
+    
+    for(int i = 0; i < strlen(cad); i++)
+        {
+            LATDbits.LATD0 = 1;
+            TXREG = cad[i];
+            __delay_ms(1);
+            LATDbits.LATD0 = 0;
+        }
+    LATDbits.LATD0 = 1;
+    TXREG = 0x0d;
+    __delay_ms(1);
+    TXREG = 0x0a;
+    __delay_ms(1);
+    LATDbits.LATD0 = 0;
+}
+////////////////////////////////////////////////////////////////////////////////
 char receive_rs232(void ){
     /* Espera indefinidamente la llegada de un caracter.
      * Method: 
@@ -94,7 +148,6 @@ char receive_rs232(void ){
     while(RCIF == 0);
     RCIF = 0;
     LATDbits.LATD1 = 0;
-    
     return RCREG;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +155,8 @@ char receive_rs232(void ){
 
 void receive_string_rs232(char *str_rec){
     /* recibe una cadena de caracteres por el puerto serie,
-     * esperando indefinidamente
-     * hasta que llega el 0x00
+     * espera de forma indefinida
+     * solo retorna despues de 0x00
     */
     /*===========================TO DO ===============================*/
     // colocar un tamaño maximo para la entrada
@@ -116,4 +169,25 @@ void receive_string_rs232(char *str_rec){
         i++;
 		
 	} while (r == 0x00);
+}
+
+void receive_AT_rs232(char *str_rec){
+    /* recibe una cadena de caracteres por el puerto serie,
+     * y la guarda en el vector argumento
+     * espera de forma indefinida
+     * solo retorna despues de 0x0D
+    */
+    /*===========================TO DO ===============================*/
+    // colocar un tamaño maximo para la entrada
+    char r = 0x00;
+    int i = 0;
+    do{
+        r = receive_rs232();
+        //////////////////////////////////////////////////////
+        send_rs232(r);/////////// ECHO//////////////////////
+        ///////////////////////////////////////////////////////
+        str_rec[i] = r;
+        i++;		
+	} while (r != 0x0A);
+    str_rec[i] = 0x00;
 }

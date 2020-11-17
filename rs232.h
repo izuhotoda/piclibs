@@ -15,3 +15,6 @@ void send_rs232(char car);
 void send_string_rs232(char *cad);
 char receive_rs232(void );
 void receive_string_rs232(char *str_rec);
+void receive_AT_rs232(char *str_rec);
+void send_raw_string_rs232(const char *cad);
+void send_AT_rs232(char *cad);
