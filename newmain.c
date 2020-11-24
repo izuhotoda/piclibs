@@ -9,6 +9,7 @@
 #include <xc.h>
 #include <stdio.h>
 #include <string.h>
+#include "at.h"
 #include "rs232.h"
 #include "adc.h"
 #define _XTAL_FREQ 8000000
@@ -59,7 +60,20 @@ void main(void) {
         // wait
         __delay_ms(500);
         */
+        at_command atcm = { "momo", AT_COMMAND_READ};
+        ///////////////////////////////////////////////////////////////
+        if(receive_AT(at_cmd)){
+            send_raw_string_rs232(at_cmd);
+            send_string_rs232("Itsn't a AT");
+        }else{            
+            send_raw_string_rs232(at_cmd);
+            send_string_rs232(at_cmd);            
+        }
+        //////////////////////////////////////////////////////////////
+        // parsing AT command
         
+        
+        /*
         receive_AT_rs232(at_cmd);
         strncpy(sub_at_cmd, at_cmd, 3);
 
@@ -110,7 +124,7 @@ void main(void) {
             }
         }
         
-        
+         */
         
         
         
