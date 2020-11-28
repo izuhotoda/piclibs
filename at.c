@@ -2,9 +2,10 @@
 #include <string.h>
 #define _XTAL_FREQ 8000000
 #include "rs232.h"
-#include "at.h"
+#include "at_datatype.h"
+#include "at_commands.h"
 
-int removeChar(int c, char *str);
+//int removeChar(int c, char *str);
 
 int receive_AT(char *string_at){    
     /* Espera de forma indefinida cuando
@@ -17,7 +18,6 @@ int receive_AT(char *string_at){
      * o cuado alcanzo el valor maximo
     */
     /*===========================TO DO ===============================*/
-    char pars_str[10] = {0};      // array for parsing
     char r = 0x00;              // primera interaccion
     int i = 0;                  // index 
     
@@ -33,11 +33,14 @@ int receive_AT(char *string_at){
             return 0;
 	} while (r != 0x0A);
     
-     string_at[i] = 0x00;   // end of string '/0'
-     
-     // removing "AT+" and testing
-     strncpy(pars_str, string_at, 3);
-        return (strcmp("AT+", pars_str));        
+    string_at[i] = '\0';   // end of string '/0'
+    
+    // testing AT+
+    if (string_at[0] == 'A' || string_at[0] == 'a')
+        if(string_at[1] == 'T' || string_at[1] == 't')
+            if (string_at[2] == '+')
+                return 1;
+    return 0;
 }
 
 /* function parsing_AT
@@ -89,14 +92,15 @@ int parsing_AT(char *at_cmd, at_command *patcmd){
     }    
     return 1;
 }
-    
+/*    
 int execute_AT(at_command * patcm){
-    send_string_rs232("parsing AT");
-    send_string_rs232(patcm->cmd);
-    
+
+    //send_string_rs232("parsing AT");
+    //send_string_rs232(patcm->cmd);
+
     switch (patcm->mode){
         case AT_COMMAND_READ:
-            send_string_rs232("read");
+            send_string_rs232("read");            
             break;
         case AT_COMMAND_RUN:
             send_string_rs232("run");
@@ -111,61 +115,8 @@ int execute_AT(at_command * patcm){
     return 1;
     
 }
-
-void receive_AT_rs232(char *str_rec){
-    /* recibe una cadena de caracteres por el puerto serie,
-     * y la guarda en el vector argumento
-     * espera de forma indefinida
-     * solo retorna despues de 0x0D
-    */
-    /*===========================TO DO ===============================*/
-    // colocar un tamaño maximo para la entrada
-    char r = 0x00;
-    int i = 0;
-    do{
-        r = receive_rs232();
-        //////////////////////////////////////////////////////
-        send_rs232(r);/////////// ECHO//////////////////////
-        ///////////////////////////////////////////////////////
-        str_rec[i] = r;
-        i++;		
-	} while (r != 0x0A);
-    str_rec[i] = 0x00;
-}
-
-void send_AT_rs232(char *cad){
-    /* recibe un string de caracteres (debe terminar con '\0')
-     * Los envia por TX dejando 1ms de espacio entre cada caracter
-     * Talvez podria funcionar con menos 
-     * Al final de la cadena envia un caracter de nueva linea 0x00 = '\n'
-     * eg.
-     * char s[]="shibanan";
-     * send_string_rs232(s);
-    */ 
-    /*===========================TO DO ===============================*/
-    //Verificar '\0' en cad
-    LATDbits.LATD0 = 1;
-    TXREG = 0x0d;
-    __delay_ms(1);
-    TXREG = 0x0a;
-    __delay_ms(1);
-    LATDbits.LATD0 = 0;
-    
-    for(int i = 0; i < strlen(cad); i++)
-        {
-            LATDbits.LATD0 = 1;
-            TXREG = cad[i];
-            __delay_ms(1);
-            LATDbits.LATD0 = 0;
-        }
-    LATDbits.LATD0 = 1;
-    TXREG = 0x0d;
-    __delay_ms(1);
-    TXREG = 0x0a;
-    __delay_ms(1);
-    LATDbits.LATD0 = 0;
-}
-
+ */ 
+/*
 int removeChar(int c, char *str){
     if (c > strlen(str) - 1)
         return 0;
@@ -175,3 +126,4 @@ int removeChar(int c, char *str){
     }
     return 1;
 }
+ */ 

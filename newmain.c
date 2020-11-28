@@ -36,15 +36,19 @@ void main(void) {
     
     while (1){        
         at_command atcm = { "momo", AT_COMMAND_READ};
-        at_command *patcm = &atcm;
+        at_command *p_at_cm = &atcm;
         ///////////////////////////////////////////////////////////////
         if(receive_AT(at_cmd)){
-            send_string_rs232("Itsn't a AT");
-        }else{
-            if(parsing_AT(at_cmd, patcm))
-                execute_AT(patcm);
+            if(parsing_AT(at_cmd, p_at_cm)){
+                if (execute_AT(p_at_cm)){
+                    send_string_rs232("execute success");                    
+                }else
+                    send_string_rs232("execute failed");
+            }
             else
                 send_string_rs232("parsing error");
+        }else{
+            send_string_rs232("Isn't an AT");
         }
     } 
     return;

@@ -1,78 +1,65 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
- * and any derivatives exclusively with Microchip products. 
- * 
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
- * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
- * TERMS. 
- */
+#ifndef AT_COMMANDS_HEADER_H
+#define	AT_COMMANDS_HEADER_H
 
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
+#include "at_datatype.h"
 
-// This is a guard condition so that contents of this file are not included
-// more than once.  
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
-
-#include <xc.h> // include processor files - each processor file is guarded.  
-
-// TODO Insert appropriate #include <>
-
-// TODO Insert C++ class definitions if appropriate
-
-// TODO Insert declarations
-
-// Comment a function and leverage automatic documentation with slash star star
-/**
-    <p><b>Function prototype:</b></p>
-  
-    <p><b>Summary:</b></p>
-
-    <p><b>Description:</b></p>
-
-    <p><b>Precondition:</b></p>
-
-    <p><b>Parameters:</b></p>
-
-    <p><b>Returns:</b></p>
-
-    <p><b>Example:</b></p>
-    <code>
- 
-    </code>
-
-    <p><b>Remarks:</b></p>
- */
-// TODO Insert declarations or function prototypes (right here) to leverage 
-// live documentation
-
-#ifdef	__cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-    // TODO If C++ is being used, regular C code needs function names to have C 
-    // linkage so the functions can be used by the c code. 
-
-#ifdef	__cplusplus
+// command definition
+int delete(at_command *p_at_cm){
+    send_string_rs232("COMMAND: delete");
+    /*
+    send_string_rs232("COMMAND: delete");
+    send_string_rs232(p_at_cm->cmd);
+    switch (p_at_cm->mode){
+    case AT_COMMAND_READ:
+        // read implementation
+        send_string_rs232("read");            
+        break;
+    case AT_COMMAND_RUN:
+        // run implementation
+        send_string_rs232("run");
+        break;
+    case AT_COMMAND_TEST:
+        // test implementation
+        send_string_rs232("test");
+        break;
+    case AT_COMMAND_SET:
+        // set implementation
+        send_string_rs232("set");
+        break;
+    }
+     */ 
+    return 1;
+    
 }
-#endif /* __cplusplus */
+int on(at_command *p_at_cm){    
+    send_string_rs232("COMMAND: on");
+    return 1;
+//	printf("on(%1d)\n", n);
+}
+int off(at_command *p_at_cm){
+    
+    send_string_rs232("COMMAND: off");
+    return 1;
+//	printf("off(%1d)\n", n);
+}
 
-#endif	/* XC_HEADER_TEMPLATE_H */
+//command index
+int (*cmd_ptr[])() = {delete, on, off};              // pointer to function
+const char *cmd_list[] = {"delete", "on", "off"};     // key list
+ 
 
+/////////////////// interface function //////////////////////////
+/* Execute the command structure
+ * return 0 if failed
+ * 1 if exit */
+int execute_AT(at_command *p_at_cmd){
+	int i;
+	for (i = 0; i < sizeof(cmd_list)/sizeof(cmd_list[0]); ++i){
+		if (!(strcmp(p_at_cmd->cmd, cmd_list[i]))){
+			return (*cmd_ptr[i])(p_at_cmd);
+		}  
+	}
+    send_string_rs232("not implemented");
+	return 0;
+}
+#endif
