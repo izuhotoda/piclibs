@@ -27,7 +27,14 @@ int receive_AT(char* );
  * if parsing it's ok return 1
  * else return 0
  */
-int parsing_at(char *at_string, at_command*);
+int parsing_AT(char *at_string, at_command*);
+
+/* Exexuteo the command structure
+ * return 0 if failed
+ * 1 if exit
+ */
+int execute_AT(at_command*);
+
 
 // receive an AT COMMAND and  save on str_rec
 void receive_AT_rs232(char *str_rec);

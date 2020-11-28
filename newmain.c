@@ -34,114 +34,18 @@ void main(void) {
     char init[]= "start";
     send_string_rs232(init); // send
     
-    while (1){
-        /*
-        // data adq
-        counter++;
-        temps[counter % N_LCTRS] = adc_start();
-        
-        // mean
-        mean = 0;
-        for (int i = 0; i < N_LCTRS; i++)
-            mean += (float)temps[i];
-        mean /= N_LCTRS;
-        
-        // trasfer function
-        mean = mean * 34.6 / 1024;
-        
-        // formating
-        sprintf(str,"%d: ", counter); // counter to string
-        sprintf(strV,"%.2f\'C" , mean );  // temp to formated string
-        find(str,strV);       // str += strV
-        
-        // send
-        send_string_rs232(str); // send
-        
-        // wait
-        __delay_ms(500);
-        */
+    while (1){        
         at_command atcm = { "momo", AT_COMMAND_READ};
+        at_command *patcm = &atcm;
         ///////////////////////////////////////////////////////////////
         if(receive_AT(at_cmd)){
-            send_raw_string_rs232(at_cmd);
             send_string_rs232("Itsn't a AT");
-        }else{            
-            send_raw_string_rs232(at_cmd);
-            send_string_rs232(at_cmd);            
+        }else{
+            if(parsing_AT(at_cmd, patcm))
+                execute_AT(patcm);
+            else
+                send_string_rs232("parsing error");
         }
-        //////////////////////////////////////////////////////////////
-        // parsing AT command
-        
-        
-        /*
-        receive_AT_rs232(at_cmd);
-        strncpy(sub_at_cmd, at_cmd, 3);
-
-        if (strcmp("AT+", sub_at_cmd))
-            send_AT_rs232("ERROR");
-        else
-        {
-            for (sub_index = 3; sub_index < MAX_AT_LENGTH ; sub_index++)
-            {
-                if (at_cmd[sub_index] == '\0'){
-                    send_AT_rs232("END_ERROR");
-                    break;
-                }
-          
-                if (at_cmd[sub_index] == '?'){
-                    if (at_cmd[sub_index + 1] == '\x0d'){
-                        //send_AT_rs232(sub_at_cmd);
-                        send_AT_rs232("READ");
-                        break;
-                    }else{
-                        send_AT_rs232("READ_ERROR");
-                        break;
-                    }
-                }
-                if (at_cmd[sub_index] == '='){
-                    if (at_cmd[sub_index + 1] == '?'){
-                     //   send_AT_rs232(sub_at_cmd);
-                        send_AT_rs232("TEST");
-                           break;
-                    }
-                    else if ((at_cmd[sub_index + 1] != '\x0d') ||(at_cmd[sub_index + 1] != '\0')){
-                        send_AT_rs232("SET");
-                           break;
-                    }else{
-                        send_AT_rs232("EQUAL_ERROR");
-                    }                                   
-                }                               
-                if (at_cmd[sub_index] == '\x0d'){
-                    if (at_cmd[sub_index + 1] == '\x0a'){
-                        //send_AT_rs232(sub_at_cmd);
-                        send_AT_rs232("EXECUTE");
-                           break;                        
-                    }else{
-                        send_AT_rs232("EXE_ERROR");
-                           break;
-                    }
-                }                
-            }
-        }
-        
-         */
-        
-        
-        
-        /*       
-        if (strcmp("AT\x0d\x0a", str))
-            send_AT_rs232("ERROR");
-        else
-            send_AT_rs232("OK");
-        
-        */
-        
-        /*
-        if (strcmp("AT", str))
-            send_string_rs232("ok");
-        else
-            send_string_rs232("error");
-        */ 
     } 
     return;
 }

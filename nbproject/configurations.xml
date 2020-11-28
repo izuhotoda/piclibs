@@ -8,6 +8,8 @@
       <itemPath>adc.h</itemPath>
       <itemPath>rs232.h</itemPath>
       <itemPath>at.h</itemPath>
+      <itemPath>at_commands.h</itemPath>
+      <itemPath>at_datatype.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
