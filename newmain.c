@@ -21,27 +21,21 @@ void main(void) {
     OSCCON=0x70;
     setup_rs232();
     adc_configure();
-    // vars
-    //unsigned int counter = 0;           // counter
-    //int temps[N_LCTRS]= {0};            // Ultimas temperaturas
-    //float mean;   
-    char at_cmd[MAX_AT_LENGTH] = {0};              // received string
-    char sub_at_cmd[10] = {0};      // array for parsing
-    char sub_index = 0;
-    
+        
     // Begin series
     
-    char init[]= "start";
-    send_string_rs232(init); // send
+    send_string_rs232("Start"); // send
+    
+    char at_str[MAX_AT_LENGTH] = {0};              // received string
+    at_command atcm = { "momo", AT_COMMAND_READ};
+    at_command *p_at_cm = &atcm;
     
     while (1){        
-        at_command atcm = { "momo", AT_COMMAND_READ};
-        at_command *p_at_cm = &atcm;
         ///////////////////////////////////////////////////////////////
-        if(receive_AT(at_cmd)){
-            if(parsing_AT(at_cmd, p_at_cm)){
+        if(receive_AT(at_str)){
+            if(parsing_AT(at_str, p_at_cm)){
                 if (execute_AT(p_at_cm)){
-                    send_string_rs232("execute success");                    
+                    //send_string_rs232("execute success");                    
                 }else
                     send_string_rs232("execute failed");
             }
@@ -50,6 +44,7 @@ void main(void) {
         }else{
             send_string_rs232("Isn't an AT");
         }
+        ///////////////////////////////////////////////////////////////
     } 
     return;
 }

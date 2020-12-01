@@ -43,6 +43,24 @@ int receive_AT(char *string_at){
     return 0;
 }
 
+/* function response_AT
+ * characters string ended '\0'
+ * arguments:
+ *      str_res: respuesta del comado
+ *       
+ * envia la respuesta de un comando solicitado
+ * TODO:
+ * ---------------------------------------------------------------------------
+ */
+void response_AT(char *str_res){
+    send_rs232('\x0c');
+    send_rs232('\x0a');
+    for(int i = 0; i < strlen(str_res); i++)
+        send_rs232(str_res[i]);
+    send_rs232('\x0c');
+    send_rs232('\x0a');
+}
+
 /* function parsing_AT
  * arguments:   
  *      at_string:  pointer to string ended in /0
@@ -92,30 +110,7 @@ int parsing_AT(char *at_cmd, at_command *patcmd){
     }    
     return 1;
 }
-/*    
-int execute_AT(at_command * patcm){
 
-    //send_string_rs232("parsing AT");
-    //send_string_rs232(patcm->cmd);
-
-    switch (patcm->mode){
-        case AT_COMMAND_READ:
-            send_string_rs232("read");            
-            break;
-        case AT_COMMAND_RUN:
-            send_string_rs232("run");
-            break;
-        case AT_COMMAND_TEST:
-            send_string_rs232("test");
-            break;
-        case AT_COMMAND_SET:
-            send_string_rs232("set");
-            break;
-    }
-    return 1;
-    
-}
- */ 
 /*
 int removeChar(int c, char *str){
     if (c > strlen(str) - 1)
@@ -127,3 +122,17 @@ int removeChar(int c, char *str){
     return 1;
 }
  */ 
+/////////////////// interface function //////////////////////////
+/* Execute the command structure
+ * return 0 if failed
+ * 1 if exit */
+int execute_AT(at_command *p_at_cmd){
+	int i;
+	for (i = 0; i < sizeof(cmd_list)/sizeof(cmd_list[0]); ++i){
+		if (!(strcmp(p_at_cmd->cmd, cmd_list[i]))){
+			return (*cmd_ptr[i])(p_at_cmd);
+		}  
+	}
+    send_string_rs232("not implemented");
+	return 0;
+}

@@ -20,6 +20,8 @@ int parsing_AT(char *at_string, at_command*);
 int execute_AT(at_command*);
 
 /* Send AT response
+ * <CR><LF> whatever <CR><LF>
  */
+void response_AT(char *str_res);
 
 #endif

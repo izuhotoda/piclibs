@@ -1,65 +1,126 @@
 #ifndef AT_COMMANDS_HEADER_H
 #define	AT_COMMANDS_HEADER_H
 
-#include "at_datatype.h"
+#include <stdio.h>
+#include "at.h"
+#include "adc.h"
 
-// command definition
-int delete(at_command *p_at_cm){
-    send_string_rs232("COMMAND: delete");
-    /*
-    send_string_rs232("COMMAND: delete");
-    send_string_rs232(p_at_cm->cmd);
+/* Command definition:
+ *      - se definen como funciones cuyo nombre es el nombre del comando
+ *      - deben ser colocados en la lista de comandos
+ *      - deben ser colocados en el array de funciones.
+ * 
+ * si se ejecuta correctamente 
+ *      - response_AT("whatever")
+ *      - response_AT("OK");
+ *      - return 1;
+ * si falla en la ejecucion
+ *      -response_AT("whatever")
+ *      - response_AT("ERROR");
+ *      - return 0;
+ * 
+ int del(at_command *p_at_cm){
     switch (p_at_cm->mode){
-    case AT_COMMAND_READ:
-        // read implementation
-        send_string_rs232("read");            
-        break;
-    case AT_COMMAND_RUN:
-        // run implementation
-        send_string_rs232("run");
-        break;
-    case AT_COMMAND_TEST:
-        // test implementation
-        send_string_rs232("test");
-        break;
-    case AT_COMMAND_SET:
-        // set implementation
-        send_string_rs232("set");
-        break;
+        case AT_COMMAND_READ:
+            response_AT("config parameters");
+            break;
+        case AT_COMMAND_RUN:
+            response_AT("del running");
+            break;
+        case AT_COMMAND_TEST:
+            // OK
+            break;
+        case AT_COMMAND_SET:
+            response_AT("del setting");
+            break;
     }
-     */ 
-    return 1;
-    
+    response_AT("OK");
+    return 1;    
 }
-int on(at_command *p_at_cm){    
-    send_string_rs232("COMMAND: on");
-    return 1;
-//	printf("on(%1d)\n", n);
+ */
+int t;
+char tempStr[10] = {0};
+int temp(at_command *p_at_cm){
+    switch (p_at_cm->mode){
+        case AT_COMMAND_TEST:
+            // OK
+            break;
+        case AT_COMMAND_READ:
+            response_AT("config parameters");
+            break;
+        case AT_COMMAND_RUN:
+            t = adc_start();
+            sprintf(tempStr, "%d", t);
+            response_AT(tempStr);
+            break;
+        case AT_COMMAND_SET:
+            response_AT("del setting");
+            break;
+    }
+    response_AT("OK");
+    return 1;    
 }
+
+int del(at_command *p_at_cm){
+    switch (p_at_cm->mode){
+        case AT_COMMAND_READ:
+            response_AT("config parameters");
+            break;
+        case AT_COMMAND_RUN:
+            response_AT("del running");
+            break;
+        case AT_COMMAND_TEST:
+            // OK
+            break;
+        case AT_COMMAND_SET:
+            response_AT("del setting");
+            break;
+    }
+    response_AT("OK");
+    return 1;    
+}
+
+int on(at_command *p_at_cm){
+    switch (p_at_cm->mode){
+        case AT_COMMAND_READ:
+            response_AT("on read");
+            break;
+        case AT_COMMAND_RUN:
+            response_AT("on running");
+            break;
+        case AT_COMMAND_TEST:
+            // OK
+            break;
+        case AT_COMMAND_SET:
+            response_AT("on setting");
+            break;
+    }
+    response_AT("OK");
+    return 1;    
+}
+
 int off(at_command *p_at_cm){
-    
-    send_string_rs232("COMMAND: off");
-    return 1;
-//	printf("off(%1d)\n", n);
+    switch (p_at_cm->mode){
+        case AT_COMMAND_READ:
+            response_AT("off read");
+            break;
+        case AT_COMMAND_RUN:
+            response_AT("off running");
+            break;
+        case AT_COMMAND_TEST:
+            // OK
+            break;
+        case AT_COMMAND_SET:
+            response_AT("off setting");
+            break;
+    }
+    response_AT("OK");
+    return 1;    
 }
 
 //command index
-int (*cmd_ptr[])() = {delete, on, off};              // pointer to function
-const char *cmd_list[] = {"delete", "on", "off"};     // key list
+int (*cmd_ptr[])() = {temp, del, on, off};              // pointer to function
+const char *cmd_list[] = {"temp", "del", "on", "off"};     // key list
  
 
-/////////////////// interface function //////////////////////////
-/* Execute the command structure
- * return 0 if failed
- * 1 if exit */
-int execute_AT(at_command *p_at_cmd){
-	int i;
-	for (i = 0; i < sizeof(cmd_list)/sizeof(cmd_list[0]); ++i){
-		if (!(strcmp(p_at_cmd->cmd, cmd_list[i]))){
-			return (*cmd_ptr[i])(p_at_cmd);
-		}  
-	}
-    send_string_rs232("not implemented");
-	return 0;
-}
 #endif
